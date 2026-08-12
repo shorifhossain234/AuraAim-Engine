@@ -20,27 +20,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install System OpenCV & Build Tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libopencv-dev cmake build-essential
-
       - name: Setup Android SDK & NDK
         uses: android-actions/setup-android@v3
         with:
           packages: 'platforms;android-34 build-tools;34.0.0 ndk;25.2.9519653 cmake;3.22.1'
 
-      - name: Create local.properties & Setup NDK
+      - name: Create local.properties
         run: |
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "ndk.dir=$ANDROID_HOME/ndk/25.2.9519653" >> local.properties
-          chmod +x gradlew || gradle wrapper
+          chmod +x ./gradlew
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
-        env:
-          ANDROID_HOME: /usr/local/lib/android/sdk
-          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/25.2.9519653
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4

@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -20,29 +20,24 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
+      - name: Setup Android SDK & NDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0 ndk;25.2.9519653 cmake;3.22.1'
 
-      - name: Accept Licenses & Install NDK / CMake
+      - name: Setup Gradle & Local Properties
         run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;25.1.8937393" "cmake;3.22.1" "platform-tools" || true
-
-      - name: Setup Gradle Wrapper
-        run: |
-          if [ ! -f "./gradlew" ]; then
-            gradle wrapper
-          fi
+          gradle wrapper --gradle-version 8.2
           chmod +x gradlew
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          echo "ndk.dir=$ANDROID_HOME/ndk/25.2.9519653" >> local.properties
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
-        env:
-          ANDROID_HOME: /usr/local/lib/android/sdk
-          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/25.1.8937393
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: AuraAim-Engine-APK
-          path: '**/*.apk'
+          path: app/build/outputs/apk/debug/app-debug.apk

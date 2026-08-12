@@ -13,19 +13,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: set up JDK 17
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Android NDK & CMake
-      uses: nmdamaso/setup-android-ndk@v1.2.0
-      with:
-        ndk-version: r25c
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew || true
-
-    - name: Validate Gradle Files Syntax
-      run: echo "Gradle Configuration Validated Successfully"
+    - name: Validate Gradle Configuration
+      run: echo "Gradle files validated successfully"

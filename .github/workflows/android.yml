@@ -3,13 +3,10 @@ name: Android CI & NDK Build
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,11 +25,11 @@ jobs:
         with:
           packages: 'platforms;android-34 build-tools;34.0.0 ndk;25.2.9519653 cmake;3.22.1'
 
-      - name: Create local.properties & Setup GradleW
+      - name: Create local.properties & Lock Gradle 8.7
         run: |
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "ndk.dir=$ANDROID_HOME/ndk/25.2.9519653" >> local.properties
-          if [ ! -f ./gradlew ]; then gradle wrapper; fi
+          gradle wrapper --gradle-version 8.7
           chmod +x ./gradlew
 
       - name: Build Debug APK

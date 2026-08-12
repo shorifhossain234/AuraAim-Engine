@@ -1,45 +1,34 @@
 name: Android CI & NDK Build
-
 on:
   push:
     branches: [ "main" ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-
-      - name: Setup Gradle
+      - name: Setup Gradle 8.7
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.7'
-
       - name: Setup Android SDK & NDK
         uses: android-actions/setup-android@v3
         with:
           packages: 'platforms;android-34 build-tools;34.0.0 ndk;25.2.9519653 cmake;3.22.1'
-
-      - name: Create local.properties & Lock Gradle 8.7
+      - name: Create local.properties
         run: |
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "ndk.dir=$ANDROID_HOME/ndk/25.2.9519653" >> local.properties
-          gradle wrapper --gradle-version 8.7
           chmod +x ./gradlew
-
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
-
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: AuraAim-Engine-APK
           path: '**/build/outputs/apk/debug/*.apk'
